@@ -1,8 +1,8 @@
 import express from "express";
 
 import { handlerReadiness } from "./api/readiness.js";
-import { handlerMetrics } from "./admin/metrics.js";
-import { handlerReset } from "./admin/reset.js";
+import { handlerMetrics } from "./api/metrics.js";
+import { handlerReset } from "./api/reset.js";
 import {
   middlewareLogResponse,
   middlewareMetricsInc,
