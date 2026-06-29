@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import {errorHandler} from "./middleware.js";
+import { BadRequestError } from "./errors.js";
 
 const profaneWords = new Set(["kerfuffle", "sharbert", "fornax"]);
 
@@ -7,9 +7,7 @@ export async function handlerValidateChirp(req: Request, res: Response) {
   const { body } = req.body;
 
   if (body.length > 140) {
-    errorHandler(new Error("Chirp is too long"), req, res, () => {});
-    // res.status(400).send({ error: "Chirp is too long" });
-    return;
+    throw new BadRequestError("Chirp is too long. Max length is 140");
   }
 
   const cleanedBody = body
