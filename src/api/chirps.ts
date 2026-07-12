@@ -1,5 +1,5 @@
 import type { Request, Response } from "express";
-import { createChirp } from "../db/queries/chirps.js";
+import { createChirp, getAllChirps, getChirpById } from "../db/queries/chirps.js";
 import { BadRequestError } from "./errors.js";
 
 const profaneWords = new Set(["kerfuffle", "sharbert", "fornax"]);
@@ -49,4 +49,21 @@ export async function handlerChirps(req: Request, res: Response) {
   const chirp = await createChirp({ body, userId });
 
   res.status(201).send(chirp);
+}
+
+export async function handlerGetChirps(req: Request, res: Response) {
+  const chirps = await getAllChirps();
+  res.status(200).send(chirps);
+}
+
+
+export async function handlerGetChirp(req: Request<{ chirpId: string }>, res: Response) {
+  const chirpId = req.params.chirpId;
+  const chirp = await getChirpById(chirpId);
+  if (!chirp) {
+    res.status(404).send({ error: "Chirp not found" });
+    return;
+  }
+
+  res.status(200).send(chirp);
 }
