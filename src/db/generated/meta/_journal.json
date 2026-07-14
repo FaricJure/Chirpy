@@ -15,6 +15,13 @@
       "when": 1783630238739,
       "tag": "0001_unknown_king_bedlam",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1784066830555,
+      "tag": "0002_calm_moonstone",
+      "breakpoints": true
     }
   ]
 }
