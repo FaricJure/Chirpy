@@ -3,6 +3,7 @@ import type { MigrationConfig } from "drizzle-orm/migrator";
 type APIConfig = {
   fileServerHits: number;
   platform: string;
+  jwtSecret: string;
 };
 
 type DBConfig = {
@@ -27,10 +28,16 @@ if (!platform) {
   throw new Error("PLATFORM is not set");
 }
 
+const jwtSecret = process.env.JWT_SECRET;
+if (!jwtSecret) {
+  throw new Error("JWT_SECRET is not set");
+}
+
 export const config: Config = {
   api: {
     fileServerHits: 0,
     platform,
+    jwtSecret: jwtSecret,
   },
   db: {
     dbURL,

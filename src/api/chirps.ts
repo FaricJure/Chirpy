@@ -1,10 +1,10 @@
 import type { Request, Response } from "express";
 import { createChirp, getAllChirps, getChirpById } from "../db/queries/chirps.js";
-import { BadRequestError } from "./errors.js";
+import { BadRequestError, UserNotAuthenticatedError } from "./errors.js";
+import { getBearerToken, validateJWT } from "./auth.js";
+import { config } from "../config.js";
 
 const profaneWords = new Set(["kerfuffle", "sharbert", "fornax"]);
-const uuidPattern =
-  /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 function cleanChirp(body: string) {
   return body
@@ -31,21 +31,17 @@ function validateChirpBody(body: unknown) {
   return cleanChirp(body);
 }
 
-function validateUserId(userId: unknown) {
-  if (typeof userId !== "string") {
-    throw new BadRequestError("User ID is required");
-  }
-
-  if (!uuidPattern.test(userId)) {
-    throw new BadRequestError("User ID must be a valid UUID");
-  }
-
-  return userId;
-}
-
 export async function handlerChirps(req: Request, res: Response) {
-  const body = validateChirpBody(req.body.body);
-  const userId = validateUserId(req.body.userId);
+  let userId: string;
+
+  try {
+    const token = getBearerToken(req);
+    userId = validateJWT(token, config.api.jwtSecret);
+  } catch {
+    throw new UserNotAuthenticatedError("Unauthorized");
+  }
+
+  const body = validateChirpBody(req.body?.body);
   const chirp = await createChirp({ body, userId });
 
   res.status(201).send(chirp);
