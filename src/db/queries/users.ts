@@ -24,3 +24,16 @@ export async function getUserByEmail(email: string) {
 
   return user;
 }
+
+export async function updateUser(
+  userId: string,
+  updates: Pick<NewUser, "email" | "hashed_password">,
+) {
+  const [user] = await db
+    .update(users)
+    .set(updates)
+    .where(eq(users.id, userId))
+    .returning();
+
+  return user;
+}

@@ -4,13 +4,18 @@ import postgres from "postgres";
 import { handlerReadiness } from "./api/readiness.js";
 import { handlerMetrics } from "./api/metrics.js";
 import { handlerReset } from "./api/reset.js";
-import { handlerCreateUser } from "./api/users.js";
+import { handlerCreateUser, handlerUpdateUser } from "./api/users.js";
 import {
   errorHandler,
   middlewareLogResponse,
   middlewareMetricsInc,
 } from "./api/middleware.js";
-import { handlerChirps, handlerGetChirp, handlerGetChirps } from "./api/chirps.js";
+import {
+  handlerChirps,
+  handlerDeleteChirp,
+  handlerGetChirp,
+  handlerGetChirps,
+} from "./api/chirps.js";
 import { migrate } from "drizzle-orm/postgres-js/migrator";
 import { drizzle } from "drizzle-orm/postgres-js";
 import { config } from "./config.js";
@@ -42,6 +47,8 @@ app.post("/api/chirps", handlerChirps);
 app.post("/api/login", handlerLogin);
 app.post("/api/refresh", handlerRefresh);
 app.post("/api/revoke", handlerRevoke);
+app.put("/api/users", handlerUpdateUser);
+app.delete("/api/chirps/:chirpId", handlerDeleteChirp);
 
 app.use(errorHandler);
 

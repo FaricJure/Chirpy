@@ -12,11 +12,23 @@ export async function deleteAllChirps() {
 }
 
 export async function getAllChirps() {
-  const result = await db.select().from(chirps).orderBy(chirps.createdAt).execute();
+  const result = await db
+    .select()
+    .from(chirps)
+    .orderBy(chirps.createdAt)
+    .execute();
   return result;
 }
 
 export async function getChirpById(chirpId: string) {
-  const [result] = await db.select().from(chirps).where(eq(chirps.id, chirpId)).execute();
+  const [result] = await db
+    .select()
+    .from(chirps)
+    .where(eq(chirps.id, chirpId))
+    .execute();
   return result;
+}
+
+export async function deleteChirp(chirpId: string) {
+  await db.delete(chirps).where(eq(chirps.id, chirpId)).execute();
 }

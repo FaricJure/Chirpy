@@ -1,6 +1,16 @@
 import type { Request, Response } from "express";
-import { createChirp, getAllChirps, getChirpById } from "../db/queries/chirps.js";
-import { BadRequestError, UserNotAuthenticatedError } from "./errors.js";
+import {
+  createChirp,
+  deleteChirp,
+  getAllChirps,
+  getChirpById,
+} from "../db/queries/chirps.js";
+import {
+  BadRequestError,
+  NotFoundError,
+  UserForbiddenError,
+  UserNotAuthenticatedError,
+} from "./errors.js";
 import { getBearerToken, validateJWT } from "./auth.js";
 import { config } from "../config.js";
 
@@ -52,8 +62,10 @@ export async function handlerGetChirps(req: Request, res: Response) {
   res.status(200).send(chirps);
 }
 
-
-export async function handlerGetChirp(req: Request<{ chirpId: string }>, res: Response) {
+export async function handlerGetChirp(
+  req: Request<{ chirpId: string }>,
+  res: Response,
+) {
   const chirpId = req.params.chirpId;
   const chirp = await getChirpById(chirpId);
   if (!chirp) {
@@ -62,4 +74,32 @@ export async function handlerGetChirp(req: Request<{ chirpId: string }>, res: Re
   }
 
   res.status(200).send(chirp);
+}
+
+export async function handlerDeleteChirp(
+  req: Request<{ chirpId: string }>,
+  res: Response,
+) {
+  let userId: string;
+
+  try {
+    const token = getBearerToken(req);
+    userId = validateJWT(token, config.api.jwtSecret);
+  } catch {
+    throw new UserNotAuthenticatedError("Unauthorized");
+  }
+
+  const chirp = await getChirpById(req.params.chirpId);
+
+  if (!chirp) {
+    throw new NotFoundError("Chirp not found");
+  }
+
+  if (chirp.userId !== userId) {
+    throw new UserForbiddenError("Forbidden");
+  }
+
+  await deleteChirp(chirp.id);
+
+  res.status(204).end();
 }
