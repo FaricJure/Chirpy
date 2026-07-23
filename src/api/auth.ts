@@ -11,6 +11,7 @@ import {
   getUserFromRefreshToken,
   revokeRefreshToken,
 } from "../db/queries/tokens.js";
+import { userToResponse } from "./user-response.js";
 type Payload = Pick<JwtPayload, "iss" | "sub" | "iat" | "exp">;
 
 export async function hashPassword(password: string): Promise<string> {
@@ -56,14 +57,11 @@ export async function handlerLogin(req: Request, res: Response) {
       revoked_at: null,
     });
 
-    // This actually removes the hash at runtime.
-    const { hashed_password: _hashedPassword, ...userResponse } = user;
-
     res.status(200).send({
-  ...userResponse,
-  token,
-  refreshToken,
-});
+      ...userToResponse(user),
+      token,
+      refreshToken,
+    });
   } catch {
     throw new UserNotAuthenticatedError("incorrect email or password");
   }

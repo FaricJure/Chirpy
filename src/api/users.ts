@@ -3,6 +3,7 @@ import { createUser, updateUser } from "../db/queries/users.js";
 import { config } from "../config.js";
 import { getBearerToken, hashPassword, validateJWT } from "./auth.js";
 import { UserNotAuthenticatedError } from "./errors.js";
+import { userToResponse } from "./user-response.js";
 
 export async function handlerCreateUser(req: Request, res: Response) {
   const { email, password } = req.body ?? {};
@@ -25,12 +26,7 @@ export async function handlerCreateUser(req: Request, res: Response) {
     hashed_password: hashedPassword,
   });
 
-  res.status(201).send({
-    id: user.id,
-    email: user.email,
-    createdAt: user.createdAt,
-    updatedAt: user.updatedAt,
-  });
+  res.status(201).send(userToResponse(user));
 }
 
 export async function handlerUpdateUser(req: Request, res: Response) {
@@ -65,10 +61,5 @@ export async function handlerUpdateUser(req: Request, res: Response) {
     throw new UserNotAuthenticatedError("Unauthorized");
   }
 
-  res.status(200).send({
-    id: user.id,
-    email: user.email,
-    createdAt: user.createdAt,
-    updatedAt: user.updatedAt,
-  });
+  res.status(200).send(userToResponse(user));
 }

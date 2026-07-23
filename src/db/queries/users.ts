@@ -37,3 +37,15 @@ export async function updateUser(
 
   return user;
 }
+
+export async function upgradeUserToChirpyRed(
+  userId: string,
+): Promise<typeof users.$inferSelect | undefined> {
+  const [user] = await db
+    .update(users)
+    .set({ is_chirpy_red: true })
+    .where(eq(users.id, userId))
+    .returning();
+
+  return user;
+}

@@ -24,6 +24,7 @@ import {
   handlerRefresh,
   handlerRevoke,
 } from "./api/auth.js";
+import { handlerPolkaWebhook } from "./api/polka.js";
 
 const migrationClient = postgres(config.db.dbURL, { max: 1 });
 await migrate(drizzle(migrationClient), config.db.migrationConfig);
@@ -47,6 +48,7 @@ app.post("/api/chirps", handlerChirps);
 app.post("/api/login", handlerLogin);
 app.post("/api/refresh", handlerRefresh);
 app.post("/api/revoke", handlerRevoke);
+app.post("/api/polka/webhooks", handlerPolkaWebhook);
 app.put("/api/users", handlerUpdateUser);
 app.delete("/api/chirps/:chirpId", handlerDeleteChirp);
 
